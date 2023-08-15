@@ -4,11 +4,11 @@ namespace ChessChallenge.Application
 {
     public class BoardTheme
     {
-        public Color LightCol = new Color(238, 216, 192, 255);
-        public Color DarkCol = new Color(171, 121, 101, 255);
+        public Color LightCol = new Color(233, 237, 204, 255);
+        public Color DarkCol = new Color(119, 153, 84, 255);
 
-        public Color selectedLight = new Color(236, 197, 123, 255);
-        public Color selectedDark = new Color(200, 158, 80, 255);
+        public Color selectedLight = new Color(244, 246, 128, 255);
+        public Color selectedDark = new Color(187, 204, 68, 255);
 
         public Color MoveFromLight = new Color(207, 172, 106, 255);
         public Color MoveFromDark = new Color(197, 158, 54, 255);

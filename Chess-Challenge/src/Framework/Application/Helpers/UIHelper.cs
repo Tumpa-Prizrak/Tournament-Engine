@@ -13,6 +13,7 @@ namespace ChessChallenge.Application
 
         static Font font;
         static Font fontSdf;
+
         static Shader shader;
 
         public enum AlignH
@@ -76,13 +77,37 @@ namespace ChessChallenge.Application
             }
         }
 
-        public static bool Button(string text, Vector2 centre, Vector2 size)
+        public static bool Button(string text, Vector2 centre, Vector2 size, bool is_disabled = false)
         {
             Rectangle rec = new(centre.X - size.X / 2, centre.Y - size.Y / 2, size.X, size.Y);
 
-            Color normalCol = new(40, 40, 40, 255);
-            Color hoverCol = new(3, 173, 252, 255);
-            Color pressCol = new(2, 119, 173, 255);
+
+            Color normalCol;
+            Color hoverCol;
+            Color pressCol;
+            if (is_disabled)
+            {
+                normalCol = new Color(40, 40, 40, 255 / 2);
+            }
+            else {
+                normalCol = new Color(40, 40, 40, 255);
+            }
+            if (is_disabled)
+            {
+                hoverCol = normalCol;
+            }
+            else
+            {
+                hoverCol = new(3, 173, 252, 255);
+            }
+            if (is_disabled)
+            {
+                pressCol = normalCol;
+            }
+            else
+            {
+                pressCol = new(2, 119, 173, 255);
+            }
 
             bool mouseOver = MouseInRect(rec);
             bool pressed = mouseOver && Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT);

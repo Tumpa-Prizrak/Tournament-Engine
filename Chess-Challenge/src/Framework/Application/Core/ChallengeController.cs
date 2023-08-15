@@ -1,5 +1,4 @@
 using ChessChallenge.Chess;
-using ChessChallenge.Example;
 using Raylib_cs;
 using System;
 using System.IO;
@@ -22,9 +21,8 @@ namespace ChessChallenge.Application
 
         public enum PlayerType
         {
-EvilBot,
             Human,
-            MyBot
+EvilBot,
         }
 
         // Game state
@@ -57,14 +55,13 @@ EvilBot,
         // Other
         readonly BoardUI boardUI;
         readonly MoveGenerator moveGenerator;
-        readonly int tokenCount;
-        readonly int debugTokenCount;
         readonly StringBuilder pgns;
+
+        bool isMatchFinished = false;
 
         public ChallengeController()
         {
             Log($"Launching Chess-Challenge version {Settings.Version}");
-            (tokenCount, debugTokenCount) = GetTokenCount();
             Warmer.Warm();
 
             rng = new Random();
@@ -78,12 +75,13 @@ EvilBot,
             botMatchStartFens = FileHelper.ReadResourceFile("Fens.txt").Split('\n').Where(fen => fen.Length > 0).ToArray();
             botTaskWaitHandle = new AutoResetEvent(false);
 
-            StartNewGame(PlayerType.Human, PlayerType.MyBot);
+            StartNewGame(PlayerType.Human, PlayerType.Human);
         }
 
         public void StartNewGame(PlayerType whiteType, PlayerType blackType)
         {
             // End any ongoing game
+            isMatchFinished = false;
             EndGame(GameResult.DrawByArbiter, log: false, autoStartNextBotMatch: false);
             gameID = rng.Next();
 
@@ -193,20 +191,7 @@ EvilBot,
 
         void SetBoardPerspective()
         {
-            // Board perspective
-            if (PlayerWhite.IsHuman || PlayerBlack.IsHuman)
-            {
-                boardUI.SetPerspective(PlayerWhite.IsHuman);
-                HumanWasWhiteLastGame = PlayerWhite.IsHuman;
-            }
-            else if (PlayerWhite.Bot is MyBot && PlayerBlack.Bot is MyBot)
-            {
-                boardUI.SetPerspective(true);
-            }
-            else
-            {
-                boardUI.SetPerspective(PlayerWhite.Bot is MyBot);
-            }
+            boardUI.SetPerspective(true);
         }
 
         ChessPlayer CreatePlayer(PlayerType type)
@@ -214,7 +199,6 @@ EvilBot,
             return type switch
             {
 PlayerType.EvilBot => new ChessPlayer(new EvilBot(), type, GameDurationMilliseconds),
-                PlayerType.MyBot => new ChessPlayer(new MyBot(), type, GameDurationMilliseconds),
                 _ => new ChessPlayer(new HumanPlayer(boardUI), type)
             };
         }
@@ -313,6 +297,7 @@ PlayerType.EvilBot => new ChessPlayer(new EvilBot(), type, GameDurationMilliseco
                     else if (autoStartNextBotMatch)
                     {
                         Log("Match finished", false, ConsoleColor.Blue);
+                        isMatchFinished = true;
                     }
                 }
             }
@@ -394,9 +379,13 @@ PlayerType.EvilBot => new ChessPlayer(new EvilBot(), type, GameDurationMilliseco
 
         public void DrawOverlay()
         {
-            BotBrainCapacityUI.Draw(tokenCount, debugTokenCount, MaxTokenCount);
             MenuUI.DrawButtons(this);
-            MatchStatsUI.DrawMatchStats(this);
+            if (isMatchFinished)
+            {
+                MatchStatsUI.MatchEnded(this);
+            } else {
+                MatchStatsUI.DrawMatchStats(this);
+            }
         }
 
         static string GetPlayerName(ChessPlayer player) => GetPlayerName(player.PlayerType);

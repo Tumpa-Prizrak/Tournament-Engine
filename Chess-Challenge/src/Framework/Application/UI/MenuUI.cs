@@ -16,7 +16,6 @@ namespace ChessChallenge.Application
         {
 { "EvilBot", ChallengeController.PlayerType.EvilBot },
             { "Human", ChallengeController.PlayerType.Human },
-            { "MyBot", ChallengeController.PlayerType.MyBot },
         };
 
         public static string[] EngineOrder = engines.Keys.ToArray();
@@ -83,9 +82,9 @@ namespace ChessChallenge.Application
                             controller.second = engines[EngineOrder[ind]];
                         }
                     }
-                } catch (IndexOutOfRangeException _) 
+                } catch (IndexOutOfRangeException)
                 {
-                    NextButtonInRow("", ref buttonPos, spacing, buttonSize);
+                    NextButtonInRow("", ref buttonPos, spacing, buttonSize, true);
                 }
             }
 
@@ -157,9 +156,9 @@ namespace ChessChallenge.Application
                 Environment.Exit(0);
             }
 
-            bool NextButtonInRow(string name, ref Vector2 pos, float spacingY, Vector2 size)
+            bool NextButtonInRow(string name, ref Vector2 pos, float spacingY, Vector2 size, bool is_disabled = false)
             {
-                bool pressed = UIHelper.Button(name, pos, size);
+                bool pressed = UIHelper.Button(name, pos, size, is_disabled);
                 pos.Y += spacingY;
                 return pressed;
             }
