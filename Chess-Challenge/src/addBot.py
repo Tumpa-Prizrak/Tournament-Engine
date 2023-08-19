@@ -1,6 +1,7 @@
 import re
 import os
 import shutil
+from sys import argv
 
 # enum PlayerType (challenge_controller_file; 24)
 # func CreatePlayer (challenge_controller_file; 214) # PlayerType.EvilBot => new ChessPlayer(new EvilBot(), type, GameDurationMilliseconds),
@@ -13,15 +14,20 @@ menu_ui_file = r"C:\Users\as240\OneDrive\Рабочий стол\Prejects\Tourna
 
 
 classname_re = re.compile(r" *public class (\w+) *: *IChessBot", re.RegexFlag.M)
+bot_files = list(filter(lambda x: x.endswith(".cs"), os.listdir(curr_dir)))
+
+if len(argv) < 2:
+    argv.append(None)  # type: ignore
+    for ind, file in enumerate(bot_files):
+        print(f"{ind}. {file}")
+else:
+    if argv[1] not in bot_files:
+        print("File not found!")
+        exit(1)
 
 while True:
     try:
-        bot_files = list(filter(lambda x: x.endswith(".cs"), os.listdir(curr_dir)))
-
-        for ind, file in enumerate(bot_files):
-            print(f"{ind}. {file}")
-
-        file: str = bot_files[int(input())]
+        file: str = argv[1] or bot_files[int(input())]
         break
     except (ValueError, IndexError):
         continue
