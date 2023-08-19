@@ -399,4 +399,5 @@ FodyWeavers.xsd
 *.sln.iml
 
 
-Chess-Challenge/src/Bots/*.cs
+# Chess-Challenge/src/Bots/*.cs
+# I think it's useless now
