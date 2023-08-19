@@ -12,7 +12,7 @@ namespace ChessChallenge.Application
     public static class MenuUI
     {
 
-        public static Dictionary<string, ChallengeController.PlayerType> engines = new() // TODO automise it
+        public static Dictionary<string, ChallengeController.PlayerType> engines = new()
         {
 { "EvilBot", ChallengeController.PlayerType.EvilBot },
             { "Human", ChallengeController.PlayerType.Human },
