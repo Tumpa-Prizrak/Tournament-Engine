@@ -1,4 +1,4 @@
-* [ ] TODO end webhook integration
+* [X] ~~*TODO end webhook integration*~~ [2023-08-19]
 * [ ] TODO Challonge integration
   * [ ] python + (sockets or HTTP API) 📈
   * [ ] Challonge-DotNet 📉
