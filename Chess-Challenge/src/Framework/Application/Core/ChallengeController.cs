@@ -9,6 +9,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using static ChessChallenge.Application.Settings;
 using static ChessChallenge.Application.ConsoleHelper;
+using System.Collections.Generic;
+using ListRandomizer;
+using ChessChallenge.Example;
 
 namespace ChessChallenge.Application
 {
@@ -22,7 +25,6 @@ namespace ChessChallenge.Application
         public enum PlayerType
         {
             Human,
-EvilBot,
         }
 
         // Game state
@@ -31,7 +33,7 @@ EvilBot,
         bool isPlaying;
         Board board;
         public ChessPlayer PlayerWhite { get; private set; }
-        public ChessPlayer PlayerBlack {get;private set;}
+        public ChessPlayer PlayerBlack { get; private set; }
 
         float lastMoveMadeTime;
         bool isWaitingToPlayMove;
@@ -43,7 +45,7 @@ EvilBot,
         readonly string[] botMatchStartFens;
         int botMatchGameIndex;
         public BotMatchStats BotStatsA { get; private set; }
-        public BotMatchStats BotStatsB {get;private set;}
+        public BotMatchStats BotStatsB { get; private set; }
         bool botAPlaysWhite;
 
 
@@ -56,6 +58,8 @@ EvilBot,
         readonly BoardUI boardUI;
         readonly MoveGenerator moveGenerator;
         readonly StringBuilder pgns;
+        public int GamesCount = 10;
+        string[] GameFens;
 
         bool isMatchFinished = false;
 
@@ -94,11 +98,19 @@ EvilBot,
                 botTaskWaitHandle = new AutoResetEvent(false);
                 Task.Factory.StartNew(BotThinkerThread, TaskCreationOptions.LongRunning);
             }
+
+            if (whiteType != PlayerType.Human && blackType != PlayerType.Human)
+            {
+                SelectPositions();
+            } else
+            {
+                GameFens = botMatchStartFens;
+            }
             // Board Setup
             board = new Board();
             bool isGameWithHuman = whiteType is PlayerType.Human || blackType is PlayerType.Human;
             int fenIndex = isGameWithHuman ? 0 : botMatchGameIndex / 2;
-            board.LoadPosition(botMatchStartFens[fenIndex]);
+            board.LoadPosition(GameFens[fenIndex]);
 
             // Player Setup
             PlayerWhite = CreatePlayer(whiteType);
@@ -115,6 +127,14 @@ EvilBot,
             isPlaying = true;
             NotifyTurnToMove();
         }
+
+        void SelectPositions()
+        {
+            List<string> j = botMatchStartFens.ToList();
+            ListRandomizer.ListExtension.Shuffle(j);
+            GameFens = j.Take(GamesCount).ToArray();
+        }
+
 
         void BotThinkerThread()
         {
@@ -155,7 +175,7 @@ EvilBot,
             }
             catch (Exception e)
             {
-                Log("An error occurred while bot was thinking.\n" + e.ToString(), true, ConsoleColor.Red);
+                Log($"An error occurred while {PlayerToMove.PlayerType} was thinking.\n" + e.ToString(), true, ConsoleColor.Red);
                 hasBotTaskException = true;
                 botExInfo = ExceptionDispatchInfo.Capture(e);
             }
@@ -198,7 +218,59 @@ EvilBot,
         {
             return type switch
             {
-PlayerType.EvilBot => new ChessPlayer(new EvilBot(), type, GameDurationMilliseconds),
+PlayerType.ZaphBot => new ChessPlayer(new ZaphBot(), type, GameDurationMilliseconds),
+PlayerType.Zambroni => new ChessPlayer(new Zambroni(), type, GameDurationMilliseconds),
+PlayerType.yoda2 => new ChessPlayer(new yoda2(), type, GameDurationMilliseconds),
+PlayerType.Velocity => new ChessPlayer(new Velocity(), type, GameDurationMilliseconds),
+PlayerType.Tyrant => new ChessPlayer(new Tyrant(), type, GameDurationMilliseconds),
+PlayerType.TinyChessDuck => new ChessPlayer(new TinyChessDuck(), type, GameDurationMilliseconds),
+PlayerType.ThrowverEngineered => new ChessPlayer(new ThrowverEngineered(), type, GameDurationMilliseconds),
+PlayerType.Theseus => new ChessPlayer(new Theseus(), type, GameDurationMilliseconds),
+PlayerType.SirBlundersaLot => new ChessPlayer(new SirBlundersaLot(), type, GameDurationMilliseconds),
+PlayerType.SillyBot => new ChessPlayer(new SillyBot(), type, GameDurationMilliseconds),
+PlayerType.Sentinel => new ChessPlayer(new Sentinel(), type, GameDurationMilliseconds),
+PlayerType.SemiroseBot => new ChessPlayer(new SemiroseBot(), type, GameDurationMilliseconds),
+PlayerType.Scarlet => new ChessPlayer(new Scarlet(), type, GameDurationMilliseconds),
+PlayerType.Sardine => new ChessPlayer(new Sardine(), type, GameDurationMilliseconds),
+PlayerType.ReverieV => new ChessPlayer(new ReverieV(), type, GameDurationMilliseconds),
+PlayerType.Radium => new ChessPlayer(new Radium(), type, GameDurationMilliseconds),
+PlayerType.Peeter1 => new ChessPlayer(new Peeter1(), type, GameDurationMilliseconds),
+PlayerType.Onion => new ChessPlayer(new Onion(), type, GameDurationMilliseconds),
+PlayerType.ObfuscoWeed => new ChessPlayer(new ObfuscoWeed(), type, GameDurationMilliseconds),
+PlayerType.NaviBot => new ChessPlayer(new NaviBot(), type, GameDurationMilliseconds),
+PlayerType.NarvvhalBot => new ChessPlayer(new NarvvhalBot(), type, GameDurationMilliseconds),
+PlayerType.MrJB73 => new ChessPlayer(new MrJB73(), type, GameDurationMilliseconds),
+PlayerType.minorMoves => new ChessPlayer(new minorMoves(), type, GameDurationMilliseconds),
+PlayerType.MagnuthCarlthen => new ChessPlayer(new MagnuthCarlthen(), type, GameDurationMilliseconds),
+PlayerType.Loevbotv1_2 => new ChessPlayer(new Loevbotv1_2(), type, GameDurationMilliseconds),
+PlayerType.LetMeAlive => new ChessPlayer(new LetMeAlive(), type, GameDurationMilliseconds),
+PlayerType.Leonidas => new ChessPlayer(new Leonidas(), type, GameDurationMilliseconds),
+PlayerType.Krabot => new ChessPlayer(new Krabot(), type, GameDurationMilliseconds),
+PlayerType.KnightToE4 => new ChessPlayer(new KnightToE4(), type, GameDurationMilliseconds),
+PlayerType.InfuehrDaniel => new ChessPlayer(new InfuehrDaniel(), type, GameDurationMilliseconds),
+PlayerType.GhostEngine => new ChessPlayer(new GhostEngine(), type, GameDurationMilliseconds),
+PlayerType.FloppyChessGaming => new ChessPlayer(new FloppyChessGaming(), type, GameDurationMilliseconds),
+PlayerType.FloppyChessBetter => new ChessPlayer(new FloppyChessBetter(), type, GameDurationMilliseconds),
+PlayerType.FloppyChess => new ChessPlayer(new FloppyChess(), type, GameDurationMilliseconds),
+PlayerType.DriedCod => new ChessPlayer(new DriedCod(), type, GameDurationMilliseconds),
+PlayerType.DeltaWeakness => new ChessPlayer(new DeltaWeakness(), type, GameDurationMilliseconds),
+PlayerType.DappsBot => new ChessPlayer(new DappsBot(), type, GameDurationMilliseconds),
+PlayerType.damlamen => new ChessPlayer(new damlamen(), type, GameDurationMilliseconds),
+PlayerType.Cosmos => new ChessPlayer(new Cosmos(), type, GameDurationMilliseconds),
+PlayerType.ChaosBot => new ChessPlayer(new ChaosBot(), type, GameDurationMilliseconds),
+PlayerType.BoyaChess => new ChessPlayer(new BoyaChess(), type, GameDurationMilliseconds),
+PlayerType.Botje9000 => new ChessPlayer(new Botje9000(), type, GameDurationMilliseconds),
+PlayerType.boohowaer => new ChessPlayer(new boohowaer(), type, GameDurationMilliseconds),
+PlayerType.Blaze => new ChessPlayer(new Blaze(), type, GameDurationMilliseconds),
+PlayerType.Better => new ChessPlayer(new Better(), type, GameDurationMilliseconds),
+PlayerType.BalooDominator => new ChessPlayer(new BalooDominator(), type, GameDurationMilliseconds),
+PlayerType.BadMeetsEvil => new ChessPlayer(new BadMeetsEvil(), type, GameDurationMilliseconds),
+PlayerType.Badbot => new ChessPlayer(new Badbot(), type, GameDurationMilliseconds),
+PlayerType.AngelBot => new ChessPlayer(new AngelBot(), type, GameDurationMilliseconds),
+PlayerType.Andiefietebel => new ChessPlayer(new Andiefietebel(), type, GameDurationMilliseconds),
+PlayerType.AlgernonB4729 => new ChessPlayer(new AlgernonB4729(), type, GameDurationMilliseconds),
+PlayerType.Ace => new ChessPlayer(new Ace(), type, GameDurationMilliseconds),
+                PlayerType.MyBot => new ChessPlayer(new MyBot(), type, GameDurationMilliseconds),
                 _ => new ChessPlayer(new HumanPlayer(boardUI), type)
             };
         }
@@ -281,18 +353,13 @@ PlayerType.EvilBot => new ChessPlayer(new EvilBot(), type, GameDurationMilliseco
                 {
                     UpdateBotMatchStats(result);
                     botMatchGameIndex++;
-                    int numGamesToPlay = botMatchStartFens.Length * 2;
+                    int numGamesToPlay = GameFens.Length * 2;
 
                     if (botMatchGameIndex < numGamesToPlay && autoStartNextBotMatch)
                     {
                         botAPlaysWhite = !botAPlaysWhite;
-                        const int startNextGameDelayMs = 600;
-                        System.Timers.Timer autoNextTimer = new(startNextGameDelayMs);
                         int originalGameID = gameID;
-                        autoNextTimer.Elapsed += (s, e) => AutoStartNextBotMatchGame(originalGameID, autoNextTimer);
-                        autoNextTimer.AutoReset = false;
-                        autoNextTimer.Start();
-
+                        AutoStartNextBotMatchGame(originalGameID);
                     }
                     else if (autoStartNextBotMatch)
                     {
@@ -303,13 +370,12 @@ PlayerType.EvilBot => new ChessPlayer(new EvilBot(), type, GameDurationMilliseco
             }
         }
 
-        private void AutoStartNextBotMatchGame(int originalGameID, System.Timers.Timer timer)
+        private void AutoStartNextBotMatchGame(int originalGameID)
         {
             if (originalGameID == gameID)
             {
                 StartNewGame(PlayerBlack.PlayerType, PlayerWhite.PlayerType);
             }
-            timer.Close();
         }
 
 
@@ -405,6 +471,7 @@ PlayerType.EvilBot => new ChessPlayer(new EvilBot(), type, GameDurationMilliseco
             BotStatsA = new BotMatchStats(nameA);
             BotStatsB = new BotMatchStats(nameB);
             botAPlaysWhite = true;
+            
             Log($"Starting new match: {nameA} vs {nameB}", false, ConsoleColor.Blue);
             StartNewGame(botTypeA, botTypeB);
         }
@@ -413,7 +480,7 @@ PlayerType.EvilBot => new ChessPlayer(new EvilBot(), type, GameDurationMilliseco
         ChessPlayer PlayerToMove => board.IsWhiteToMove ? PlayerWhite : PlayerBlack;
         ChessPlayer PlayerNotOnMove => board.IsWhiteToMove ? PlayerBlack : PlayerWhite;
 
-        public int TotalGameCount => botMatchStartFens.Length * 2;
+        public int TotalGameCount => GamesCount * 2;
         public int CurrGameNumber => Math.Min(TotalGameCount, botMatchGameIndex + 1);
         public string AllPGNs => pgns.ToString();
 

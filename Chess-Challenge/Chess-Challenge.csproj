@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Raylib-cs" Version="4.5.0.2" />
+    <PackageReference Include="ShuffleList" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,14 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="src\Evil Bot\EvilBot.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="resources\Fens.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="resources\Fonts\OPENSANS-SEMIBOLD.TTF">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -44,7 +39,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="src\Bots\" />
     <Folder Include="src\Framework\Chess\" />
   </ItemGroup>
 

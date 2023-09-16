@@ -8,12 +8,12 @@ from sys import argv
 # Dict engines (menu_ui_file; 16) # { "EvilBot", ChallengeController.PlayerType.EvilBot },
 
 curr_dir = r"C:\Users\as240\Downloads"
-bots_dir = r"C:\Users\as240\OneDrive\Рабочий стол\Prejects\Tournament-Engine\Chess-Challenge\src\Bots"
-challenge_controller_file = r"C:\Users\as240\OneDrive\Рабочий стол\Prejects\Tournament-Engine\Chess-Challenge\src\Framework\Application\Core\ChallengeController.cs"
-menu_ui_file = r"C:\Users\as240\OneDrive\Рабочий стол\Prejects\Tournament-Engine\Chess-Challenge\src\Framework\Application\UI\MenuUI.cs"
+bots_dir = r"C:\Users\as240\OneDrive\Рабочий стол\Projects\Tournament-Engine\Chess-Challenge\src\Bots"
+challenge_controller_file = r"C:\Users\as240\OneDrive\Рабочий стол\Projects\Tournament-Engine\Chess-Challenge\src\Framework\Application\Core\ChallengeController.cs"
+menu_ui_file = r"C:\Users\as240\OneDrive\Рабочий стол\Projects\Tournament-Engine\Chess-Challenge\src\Framework\Application\UI\MenuUI.cs"
 
 
-classname_re = re.compile(r" *public class (\w+) *: *IChessBot", re.RegexFlag.M)
+classname_re = re.compile(r" *public class (\S+) *: *IChessBot", re.RegexFlag.M)
 bot_files = list(filter(lambda x: x.endswith(".cs"), os.listdir(curr_dir)))
 
 if len(argv) < 2:
@@ -22,7 +22,7 @@ if len(argv) < 2:
         print(f"{ind}. {file}")
 else:
     if argv[1] not in bot_files:
-        print("File not found!")
+        print("File is not found!")
         exit(1)
 
 while True:
@@ -45,7 +45,7 @@ print(classname)
 
 with open(challenge_controller_file, "r") as fr:
     data = fr.read().splitlines()
-    data.insert(24, f"{classname},")
+    data.insert(25, f"{classname},")
     data.insert(data.index(" " * 12 + "return type switch") + 2, f"PlayerType.{classname} => new ChessPlayer(new {classname}(), type, GameDurationMilliseconds),")
 
 with open(challenge_controller_file, "w") as fw:
