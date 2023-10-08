@@ -21,16 +21,82 @@ namespace ChessChallenge.Application
         public PlayerType? first = null;
         public PlayerType? second = null;
         public int page = 0;
-
+        public bool isSettings = false;
         public enum PlayerType
         {
+Valibot,
+KurentPosition,
+KingGambot,
+ZaphBot,
+Zambroni,
+yoda2,
+Velocity,
+Tyrant,
+TinyChessDuck,
+ThrowverEngineered,
+Theseus,
+SirBlundersaLot,
+SillyBot,
+Sentinel,
+SemiroseBot,
+Scarlet,
+Sardine,
+ReverieV,
+Radium,
+Peeter1,
+Onion,
+ObfuscoWeed,
+NaviBot,
+NarvvhalBot,
+MrJB73,
+minorMoves,
+MagnuthCarlthen,
+Loevbotv1_2,
+LetMeAlive,
+Leonidas,
+Krabot,
+KnightToE4,
+InfuehrDaniel,
+GhostEngine,
+FloppyChessGaming,
+FloppyChessBetter,
+FloppyChess,
+DriedCod,
+DeltaWeakness,
+DappsBot,
+damlamen,
+Cosmos,
+ChaosBot,
+BoyaChess,
+Botje9000,
+boohowaer,
+Blaze,
+Better,
+BalooDominator,
+BadMeetsEvil,
+Badbot,
+AngelBot,
+Andiefietebel,
+AlgernonB4729,
+Ace,
+            MyBot,
             Human,
         }
+
+        public static Dictionary<string, string[]> modes = new() { };
+
+        public static Dictionary<string, string> fens = new()
+        {
+            {"standart", "Fens.txt" },
+            {"chess960", "chess960Fens.txt" }
+        };
+
+        public string key = "standart";
 
         // Game state
         readonly Random rng;
         int gameID;
-        bool isPlaying;
+        public bool isPlaying;
         Board board;
         public ChessPlayer PlayerWhite { get; private set; }
         public ChessPlayer PlayerBlack { get; private set; }
@@ -42,7 +108,6 @@ namespace ChessChallenge.Application
         public bool HumanWasWhiteLastGame { get; private set; }
 
         // Bot match state
-        readonly string[] botMatchStartFens;
         int botMatchGameIndex;
         public BotMatchStats BotStatsA { get; private set; }
         public BotMatchStats BotStatsB { get; private set; }
@@ -61,11 +126,11 @@ namespace ChessChallenge.Application
         public int GamesCount = 10;
         string[] GameFens;
 
-        bool isMatchFinished = false;
+        public bool isMatchFinished = false;
 
         public ChallengeController()
         {
-            Log($"Launching Chess-Challenge version {Settings.Version}");
+            Log($"Launching Tournament-Chess version {Settings.Version}");
             Warmer.Warm();
 
             rng = new Random();
@@ -76,7 +141,10 @@ namespace ChessChallenge.Application
 
             BotStatsA = new BotMatchStats("IBot");
             BotStatsB = new BotMatchStats("IBot");
-            botMatchStartFens = FileHelper.ReadResourceFile("Fens.txt").Split('\n').Where(fen => fen.Length > 0).ToArray();
+            foreach (string key in fens.Keys)
+            {
+                modes.Add(key, FileHelper.ReadResourceFile(fens[key]).Split('\n').Where(fen => fen.Length > 0).ToArray());
+            }
             botTaskWaitHandle = new AutoResetEvent(false);
 
             StartNewGame(PlayerType.Human, PlayerType.Human);
@@ -104,13 +172,14 @@ namespace ChessChallenge.Application
                 SelectPositions();
             } else
             {
-                GameFens = botMatchStartFens;
+                GameFens = modes[key];
             }
             // Board Setup
             board = new Board();
             bool isGameWithHuman = whiteType is PlayerType.Human || blackType is PlayerType.Human;
             int fenIndex = isGameWithHuman ? 0 : botMatchGameIndex / 2;
             board.LoadPosition(GameFens[fenIndex]);
+            ConsoleHelper.Log(GameFens[fenIndex]);
 
             // Player Setup
             PlayerWhite = CreatePlayer(whiteType);
@@ -130,7 +199,7 @@ namespace ChessChallenge.Application
 
         void SelectPositions()
         {
-            List<string> j = botMatchStartFens.ToList();
+            List<string> j = modes[key].ToList();
             ListRandomizer.ListExtension.Shuffle(j);
             GameFens = j.Take(GamesCount).ToArray();
         }
@@ -218,6 +287,9 @@ namespace ChessChallenge.Application
         {
             return type switch
             {
+PlayerType.Valibot => new ChessPlayer(new Valibot(), type, GameDurationMilliseconds),
+PlayerType.KurentPosition => new ChessPlayer(new KurentPosition(), type, GameDurationMilliseconds),
+PlayerType.KingGambot => new ChessPlayer(new KingGambot(), type, GameDurationMilliseconds),
 PlayerType.ZaphBot => new ChessPlayer(new ZaphBot(), type, GameDurationMilliseconds),
 PlayerType.Zambroni => new ChessPlayer(new Zambroni(), type, GameDurationMilliseconds),
 PlayerType.yoda2 => new ChessPlayer(new yoda2(), type, GameDurationMilliseconds),
@@ -332,7 +404,7 @@ PlayerType.Ace => new ChessPlayer(new Ace(), type, GameDurationMilliseconds),
             }
         }
 
-        void EndGame(GameResult result, bool log = true, bool autoStartNextBotMatch = true)
+        public void EndGame(GameResult result, bool log = true, bool autoStartNextBotMatch = true)
         {
             if (isPlaying)
             {
@@ -358,8 +430,12 @@ PlayerType.Ace => new ChessPlayer(new Ace(), type, GameDurationMilliseconds),
                     if (botMatchGameIndex < numGamesToPlay && autoStartNextBotMatch)
                     {
                         botAPlaysWhite = !botAPlaysWhite;
+                        const int startNextGameDelayMs = 600;
+                        System.Timers.Timer autoNextTimer = new(startNextGameDelayMs);
                         int originalGameID = gameID;
-                        AutoStartNextBotMatchGame(originalGameID);
+                        autoNextTimer.Elapsed += (s, e) => AutoStartNextBotMatchGame(originalGameID, autoNextTimer);
+                        autoNextTimer.AutoReset = false;
+                        autoNextTimer.Start();
                     }
                     else if (autoStartNextBotMatch)
                     {
@@ -370,7 +446,7 @@ PlayerType.Ace => new ChessPlayer(new Ace(), type, GameDurationMilliseconds),
             }
         }
 
-        private void AutoStartNextBotMatchGame(int originalGameID)
+        private void AutoStartNextBotMatchGame(int originalGameID, System.Timers.Timer timer)
         {
             if (originalGameID == gameID)
             {

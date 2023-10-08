@@ -87,7 +87,7 @@ namespace ChessChallenge.Application
             Color pressCol;
             if (is_disabled)
             {
-                normalCol = new Color(40, 40, 40, 255 / 2);
+                normalCol = new Color(40, 40, 40, (int)(255 / 3f));
             }
             else {
                 normalCol = new Color(40, 40, 40, 255);

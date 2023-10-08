@@ -16,14 +16,14 @@ menu_ui_file = r"C:\Users\as240\OneDrive\Рабочий стол\Projects\Tourna
 classname_re = re.compile(r" *public class (\S+) *: *IChessBot", re.RegexFlag.M)
 bot_files = list(filter(lambda x: x.endswith(".cs"), os.listdir(curr_dir)))
 
-if len(argv) < 2:
-    argv.append(None)  # type: ignore
-    for ind, file in enumerate(bot_files):
-        print(f"{ind}. {file}")
-else:
-    if argv[1] not in bot_files:
-        print("File is not found!")
-        exit(1)
+# if len(argv) < 2:
+argv.append(None)  # type: ignore
+for ind, file in enumerate(bot_files):
+    print(f"{ind}. {file}")
+# else:
+#     if argv[1] not in bot_files:
+#         print("File is not found!")
+#         exit(1)
 
 while True:
     try:
